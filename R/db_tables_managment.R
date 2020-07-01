@@ -90,7 +90,7 @@ pgDropTables = function(conn,
 
   # Get tables names matching pattern
   tables = dbListTables(conn)
-  tables = tables[str_detect(tables, pattern)]
+  tables = tables[str_detect(tables, as.character(pattern))]
   if (!length(tables))
     stop(paste0("No table matching pattern '", pattern,"'"))
 

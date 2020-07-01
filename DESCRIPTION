@@ -20,4 +20,5 @@ Imports:
     igraph
 Suggests: 
     stars,
-    spData
+    spData,
+    igraphdata

@@ -324,7 +324,7 @@ pgisPolygonizeRaster = function(conn,
                                 rast.tbl,
                                 grid.tbl,
                                 exclude.nodata = TRUE,
-                                disconnect = TRUE)
+                                disconnect = FALSE)
 {
   if (!rast.tbl %in% dbListTables(conn))
     stop(paste("Raster table", rast.tbl, "does not exist"))
