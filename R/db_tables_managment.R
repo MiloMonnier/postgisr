@@ -1,19 +1,18 @@
 
 #' List indexes of a database
 #'
-#' List all indices attached to tables of a database.
+#' List all indexes attached to tables of a database.
 #'
 #' @param conn a PostgreSQLConnection object.
 #' @param tables character vector; tables names from wich to list indexes.
 #' If NULL (default), all indexes all returned.
-#' @param disconnect boolean; shall the connection be closed at the end ? (default: TRUE)
 #'
-#' @return a dataframe
+#' @return a dataframe.
 #' @export
 #'
-#' @importFrom RPostgreSQL  dbGetQuery
-#' @importFrom RPostgreSQL  dbDisconnect
 #' @importFrom methods is
+#' @importFrom RPostgreSQL  dbGetQuery
+#'
 #' @examples
 #' library(RPostgreSQL)
 #' data(mtcars)
@@ -21,11 +20,11 @@
 #'                  dbname="postgres", user="postgres", password="postgres")
 #' dbWriteTable(conn, "mtcars", mtcars, overwrite=TRUE)
 #' dbSendQuery(conn, "CREATE INDEX IF NOT EXISTS mpg_idx ON mtcars USING btree(mpg);")
-#' df = pgListIndexes(conn, "mtcars") # Same
+#' head(pgListIndexes(conn, "mtcars"))
+#' dbDisconnect(conn)
 #'
 pgListIndexes = function(conn,
-                         tables,
-                         disconnect = TRUE)
+                         tables)
 {
   if (!is(conn, "PostgreSQLConnection"))
     stop("'conn' must be connection object: <PostgreSQLConnection>")
@@ -43,10 +42,7 @@ pgListIndexes = function(conn,
       WHERE tablename IN (", tables, ");
     ")
   }
-  df = dbGetQuery(conn, q)
-  if (disconnect)
-    dbDisconnect(conn)
-  return(df)
+  dbGetQuery(conn, q)
 }
 
 
@@ -57,7 +53,6 @@ pgListIndexes = function(conn,
 #' @param conn a PostgreSQLConnection object.
 #' @param pattern character; string pattern matching tables names .
 #' @param verbose boolean; whether or not drop message must be printed.
-#' @param disconnect boolean; shall the connection be closed at the end ? (default: TRUE)
 #'
 #' @references
 #' https://stackoverflow.com/questions/4202135/how-to-drop-multiple-tables-in-postgresql-using-a-wildcard
@@ -68,7 +63,7 @@ pgListIndexes = function(conn,
 #' @importFrom stringr str_detect
 #' @importFrom RPostgreSQL dbListTables
 #' @importFrom RPostgreSQL dbSendQuery
-#' @importFrom RPostgreSQL dbDisconnect
+#'
 #' @examples
 #' library(RPostgreSQL)
 #' data(mtcars)
@@ -77,11 +72,11 @@ pgListIndexes = function(conn,
 #' dbWriteTable(conn, "mtcars", mtcars, overwrite=TRUE)
 #' dbWriteTable(conn, "mtcars2", mtcars, overwrite=TRUE)
 #' pgDropTables(conn, "cars") # Will drop the 2
+#' dbDisconnect(conn)
 #'
 pgDropTables = function(conn,
                         pattern,
-                        verbose = TRUE,
-                        disconnect = TRUE)
+                        verbose = TRUE)
 {
   if (missing(pattern))
     stop("pattern required")
@@ -96,8 +91,7 @@ pgDropTables = function(conn,
 
   q = paste0("DROP TABLE IF EXISTS ", paste(tables, collapse=", ")," CASCADE;")
   dbSendQuery(conn, q)
-  if (disconnect)
-    dbDisconnect(conn)
+
   if (verbose)
     message(paste("Dropped tables:", paste(tables, collapse=" ")))
 }

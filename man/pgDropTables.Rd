@@ -4,7 +4,7 @@
 \alias{pgDropTables}
 \title{Drop tables from a PostgreSQL database}
 \usage{
-pgDropTables(conn, pattern, verbose = TRUE, disconnect = TRUE)
+pgDropTables(conn, pattern, verbose = TRUE)
 }
 \arguments{
 \item{conn}{a PostgreSQLConnection object.}
@@ -12,8 +12,6 @@ pgDropTables(conn, pattern, verbose = TRUE, disconnect = TRUE)
 \item{pattern}{character; string pattern matching tables names .}
 
 \item{verbose}{boolean; whether or not drop message must be printed.}
-
-\item{disconnect}{boolean; shall the connection be closed at the end ? (default: TRUE)}
 }
 \description{
 Drop tables from a PostgreSQL database matching a pattern with CASCADE.
@@ -26,6 +24,7 @@ conn = dbConnect(drv=dbDriver("PostgreSQL"), host="localhost", port=5432,
 dbWriteTable(conn, "mtcars", mtcars, overwrite=TRUE)
 dbWriteTable(conn, "mtcars2", mtcars, overwrite=TRUE)
 pgDropTables(conn, "cars") # Will drop the 2
+dbDisconnect(conn)
 
 }
 \references{

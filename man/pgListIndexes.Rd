@@ -4,21 +4,19 @@
 \alias{pgListIndexes}
 \title{List indexes of a database}
 \usage{
-pgListIndexes(conn, tables, disconnect = TRUE)
+pgListIndexes(conn, tables)
 }
 \arguments{
 \item{conn}{a PostgreSQLConnection object.}
 
 \item{tables}{character vector; tables names from wich to list indexes.
 If NULL (default), all indexes all returned.}
-
-\item{disconnect}{boolean; shall the connection be closed at the end ? (default: TRUE)}
 }
 \value{
-a dataframe
+a dataframe.
 }
 \description{
-List all indices attached to tables of a database.
+List all indexes attached to tables of a database.
 }
 \examples{
 library(RPostgreSQL)
@@ -27,6 +25,7 @@ conn = dbConnect(drv=dbDriver("PostgreSQL"), host="localhost", port=5432,
                  dbname="postgres", user="postgres", password="postgres")
 dbWriteTable(conn, "mtcars", mtcars, overwrite=TRUE)
 dbSendQuery(conn, "CREATE INDEX IF NOT EXISTS mpg_idx ON mtcars USING btree(mpg);")
-df = pgListIndexes(conn, "mtcars") # Same
+head(pgListIndexes(conn, "mtcars"))
+dbDisconnect(conn)
 
 }

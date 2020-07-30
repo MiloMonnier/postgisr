@@ -4,22 +4,14 @@
 \alias{pgisRasterizeTable}
 \title{Rasterize a PostGIS vector table}
 \usage{
-pgisRasterizeTable(
-  conn,
-  geom.tbl,
-  rast.tbl,
-  xref = NULL,
-  yref = NULL,
-  scale = 1000,
-  disconnect = TRUE
-)
+pgisRasterizeTable(conn, tbl, name, xref = NULL, yref = NULL, scale = 1000)
 }
 \arguments{
 \item{conn}{a PostgreSQLConnection object.}
 
-\item{geom.tbl}{character; name of the input vector table}
+\item{tbl}{character; name of the input vector table to rasterize.}
 
-\item{rast.tbl}{character; name of the output raster table}
+\item{name}{character; name of the output raster table.}
 
 \item{xref}{numeric; x coordinate of reference pixel bottomleft corner.
 If NULL (default), the center of the extent is taken.}
@@ -28,8 +20,6 @@ If NULL (default), the center of the extent is taken.}
 If NULL (default), the center of the extent is taken.}
 
 \item{scale}{numeric; size of the raster pixels, in meters (default: 1000).}
-
-\item{disconnect}{boolean; shall the connection be closed at the end ? (default: TRUE)}
 }
 \description{
 Rasterize a PostGIS vector table.
@@ -39,10 +29,13 @@ library(spData)
 library(RPostgreSQL)
 library(sf)
 data(seine)
+Sys.sleep(10)
 conn = dbConnect(drv=dbDriver("PostgreSQL"), host="localhost", port=5432,
                 dbname="foodflows", user="milo", password="postgres")
 sf::dbWriteTable(conn, name="seine", seine, overwrite=TRUE)
-pgisRasterizeTable(conn, "seine", "seine_rast", disconnect=FALSE)
+Sys.sleep(10)
+pgisRasterizeTable(conn, "seine", "seine_rast")
+Sys.sleep(10)
 rast = pgisGetRaster(conn, "seine_rast", flip=TRUE)
 raster::plot(rast)
 

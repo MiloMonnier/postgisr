@@ -10,8 +10,7 @@ pgisSimplifyGeom(
   tolerance,
   geom.col = "geometry",
   new.geom.col = "geometry_simpl",
-  verbose = TRUE,
-  disconnect = TRUE
+  verbose = TRUE
 )
 }
 \arguments{
@@ -28,8 +27,6 @@ simplified geometry will be written. If identical to \code{geom.col}, this
 one is overwritten (default: geometry_simpl).}
 
 \item{verbose}{boolean; shall the gain of memory be printed ? (default: TRUE).}
-
-\item{disconnect}{boolean; shall the connection be closed at the end ? (default: TRUE)}
 }
 \description{
 Highly detailed geometries use more memory and make geoprocesses longer.
@@ -43,8 +40,9 @@ data(seine)
 conn = dbConnect(drv=dbDriver("PostgreSQL"), host="localhost", port=5432,
                dbname="foodflows", user="postgres", password="postgres")
 dbWriteTable(conn, name="seine", seine, overwrite=TRUE)
-pgisSimplifyGeom(conn, "seine", tolerance=10, disconnect=FALSE)
-pgisSimplifyGeom(conn, "seine", tolerance=100, disconnect=FALSE)
-pgisSimplifyGeom(conn, "seine", tolerance=1000, disconnect=FALSE)
+pgisSimplifyGeom(conn, "seine", tolerance=10)
+pgisSimplifyGeom(conn, "seine", tolerance=100)
+pgisSimplifyGeom(conn, "seine", tolerance=1000)
+dbDisconnect(conn)
 
 }

@@ -4,13 +4,7 @@
 \alias{pgisMakeValid}
 \title{Correct PostGIS table geometry errors}
 \usage{
-pgisMakeValid(
-  conn,
-  tbl,
-  geom.col = "geometry",
-  verbose = TRUE,
-  disconnect = TRUE
-)
+pgisMakeValid(conn, tbl, geom.col = "geometry", verbose = TRUE)
 }
 \arguments{
 \item{conn}{a PostgreSQLConnection object.}
@@ -20,8 +14,6 @@ pgisMakeValid(
 \item{geom.col}{character; name of the geometry column (default: 'geometry).}
 
 \item{verbose}{boolean; wheter or not warning when correction are applied (default: TRUE)}
-
-\item{disconnect}{boolean; shall the connection be closed at the end ? (default: TRUE)}
 }
 \description{
 The geometry of a table can be invalid (most of the time because of

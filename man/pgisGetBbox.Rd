@@ -4,7 +4,7 @@
 \alias{pgisGetBbox}
 \title{Get bbox of a table}
 \usage{
-pgisGetBbox(conn, tbl, geom.col = "geometry", disconnect = TRUE)
+pgisGetBbox(conn, tbl, geom.col = "geometry")
 }
 \arguments{
 \item{conn}{a PostgreSQLConnection object.}
@@ -12,8 +12,6 @@ pgisGetBbox(conn, tbl, geom.col = "geometry", disconnect = TRUE)
 \item{tbl}{character; table name.}
 
 \item{geom.col}{character; name of the geometry column (default: 'geometry).}
-
-\item{disconnect}{boolean; shall the connection be closed at the end ? (default: TRUE)}
 }
 \value{
 a bbox class object.
@@ -32,5 +30,6 @@ conn = dbConnect(drv=dbDriver("PostgreSQL"), host="localhost", port=5432,
 dbWriteTable(conn, name="seine", seine, overwrite=TRUE)
 bb = pgisGetBbox(conn, "seine")
 (class(bb)=="bbox")
+dbDisconnect(conn)
 
 }

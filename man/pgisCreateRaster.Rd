@@ -4,7 +4,7 @@
 \alias{pgisCreateRaster}
 \title{Create a raster into PostGIS}
 \usage{
-pgisCreateRaster(conn, tbl, extent, scale = 1000, disconnect = TRUE)
+pgisCreateRaster(conn, tbl, extent, scale = 1000)
 }
 \arguments{
 \item{conn}{a PostgreSQLConnection object.}
@@ -15,8 +15,6 @@ pgisCreateRaster(conn, tbl, extent, scale = 1000, disconnect = TRUE)
 objet, a sf object, or the name of a PostGIS table (default: NULL).}
 
 \item{scale}{numeric; size of the raster pixels, in meters (default: 1000).}
-
-\item{disconnect}{boolean; shall the connection be closed at the end ? (default: TRUE)}
 }
 \description{
 Creates into PostGIS database a raster covering a given extent, with a given
@@ -31,12 +29,12 @@ data(seine) # CRS is in meters
 # Create a raster of 5km resolution pixel covering french seine river
 conn = dbConnect(drv=dbDriver("PostgreSQL"), host="localhost", port=5432,
                 dbname="foodflows", user="milo", password="postgres")
-pgisCreateRaster(conn, "rastertest", extent=seine, scale=5000, disconnect=FALSE)
+pgisCreateRaster(conn, "rastertest", extent=seine, scale=5000)
 # Check
 rast = pgisGetRaster(conn, "rastertest")
-dbDisconnect(conn)
 values(rast) = rnorm(ncell(rast))
 plot(rast)
 plot(st_geometry(seine), add=TRUE)
+dbDisconnect(conn)
 
 }

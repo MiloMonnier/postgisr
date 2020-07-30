@@ -4,25 +4,17 @@
 \alias{pgisPolygonizeRaster}
 \title{Convert a PostGIS raster into a polygon grid}
 \usage{
-pgisPolygonizeRaster(
-  conn,
-  rast.tbl,
-  grid.tbl,
-  exclude.nodata = TRUE,
-  disconnect = TRUE
-)
+pgisPolygonizeRaster(conn, tbl, name, exclude.nodata = TRUE)
 }
 \arguments{
 \item{conn}{a PostgreSQLConnection object.}
 
-\item{rast.tbl}{character; input raster table name.}
+\item{tbl}{character; input raster table name.}
 
-\item{grid.tbl}{character; output polygon table name.}
+\item{name}{character; output polygon table name.}
 
 \item{exclude.nodata}{boolean; if TRUE, only those pixels whose values are
 not NODATA are returned as points (default: TRUE).}
-
-\item{disconnect}{boolean; shall the connection be closed at the end ? (default: TRUE)}
 }
 \description{
 Convert a PostGIS raster into a polygon grid
@@ -37,7 +29,7 @@ conn = dbConnect(drv=dbDriver("PostgreSQL"), host="localhost", port=5432,
 # Example 1: build a grid based on a simple raster
 data(elev)
 pgisWriteRaster(elev, dbname="foodflows", crs=2154)
-pgisPolygonizeRaster(conn, "elev", "elev_grid", exclude.nodata=TRUE, disconnect=FALSE)
+pgisPolygonizeRaster(conn, "elev", "elev_grid", exclude.nodata=TRUE)
 rast = pgisGetRaster(conn, tbl="elev")
 grid = st_read(conn, "elev_grid")
 plot(rast)
@@ -45,12 +37,13 @@ plot(st_geometry(grid), border="red", add=TRUE)
 # Example 2: build a grid convering only a vector shape
 data(seine)
 sf::dbWriteTable(conn, "seine", seine, overwrite=TRUE)
-pgisRasterizeTable(conn, "seine", "seine_rast", scale=10000, disconnect=FALSE)
-pgisPolygonizeRaster(conn, "seine_rast", "seine_grid", exclude.nodata=TRUE, disconnect=FALSE)
+pgisRasterizeTable(conn, "seine", "seine_rast", scale=10000)
+pgisPolygonizeRaster(conn, "seine_rast", "seine_grid", exclude.nodata=TRUE)
 rast = pgisGetRaster(conn, tbl="seine_rast", flip=TRUE)
 grid = st_read(conn, "seine_grid")
 plot(st_geometry(seine))
 plot(rast, add=TRUE)
 plot(st_geometry(grid), border="red", add=TRUE)
+dbDisconnect(conn)
 
 }

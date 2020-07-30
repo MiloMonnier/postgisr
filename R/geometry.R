@@ -6,13 +6,12 @@
 #' @param conn a PostgreSQLConnection object.
 #' @param tbl character; table name.
 #' @param geom.col character; name of the geometry column (default: 'geometry).
-#' @param disconnect boolean; shall the connection be closed at the end ? (default: TRUE)
 #'
 #' @return a numeric EPSG code of 4 numbers.
 #' @export
 #'
 #' @importFrom RPostgreSQL dbGetQuery
-#' @importFrom RPostgreSQL dbDisconnect
+#'
 #' @examples
 #' library(spData)
 #' library(sf)
@@ -22,18 +21,16 @@
 #'                 dbname="foodflows", user="postgres", password="postgres")
 #' dbWriteTable(conn, name="seine", seine, overwrite=TRUE)
 #' (pgisGetEPSG(conn, "seine")==2154)
+#' dbDisconnect(conn)
 #'
 pgisGetEPSG = function(conn,
                        tbl,
-                       geom.col   = "geometry",
-                       disconnect = TRUE)
+                       geom.col = "geometry")
 {
   if (!is(conn, "PostgreSQLConnection"))
     stop("'conn' must be connection object: <PostgreSQLConnection>")
 
   epsg = dbGetQuery(conn, paste0("SELECT ST_SRID(", geom.col, ") FROM ", tbl, " LIMIT 1;"))
-  if (disconnect)
-    dbDisconnect(conn)
   as.numeric(epsg)
 }
 
@@ -46,14 +43,13 @@ pgisGetEPSG = function(conn,
 #' @param conn a PostgreSQLConnection object.
 #' @param tbl character; table name.
 #' @param geom.col character; name of the geometry column (default: 'geometry).
-#' @param disconnect boolean; shall the connection be closed at the end ? (default: TRUE)
 #'
 #' @return a bbox class object.
 #' @export
 #'
 #' @importFrom RPostgreSQL dbGetQuery
-#' @importFrom RPostgreSQL dbDisconnect
 #' @importFrom sf st_bbox
+#'
 #' @examples
 #' library(spData)
 #' library(sf)
@@ -64,13 +60,13 @@ pgisGetEPSG = function(conn,
 #' dbWriteTable(conn, name="seine", seine, overwrite=TRUE)
 #' bb = pgisGetBbox(conn, "seine")
 #' (class(bb)=="bbox")
+#' dbDisconnect(conn)
 #'
 pgisGetBbox = function(conn,
                        tbl,
-                       geom.col   = "geometry",
-                       disconnect = TRUE)
+                       geom.col = "geometry")
 {
-  # Get table geometry extent and its EPSG
+  # Get table geometry extent coordinates
   q = paste0("
         SELECT
           min(ST_XMin(", geom.col, ")) as xmin,
@@ -79,17 +75,19 @@ pgisGetBbox = function(conn,
           max(ST_YMax(", geom.col, ")) as ymax
         FROM ", tbl, ";
     ")
-  bbox = dbGetQuery(conn, q)
+  ext = dbGetQuery(conn, q)
+
+  # Get the EPSG code of the Coordinate Reference System (CRS)
   q = paste0("SELECT ST_SRID(", geom.col, ") FROM ", tbl, " LIMIT 1;")
   epsg = dbGetQuery(conn, q)
-  if (disconnect)
-    dbDisconnect(conn)
-  # Convert it to simple feature bbox object
-  bbox = st_bbox(c(xmin=bbox$xmin, xmax=bbox$xmax, ymin=bbox$ymin, ymax=bbox$ymax),
-                 epsg)
+
+  # Convert the extent coordinates into a sf bbox object
+  bbox = c(xmin=ext$xmin,
+          xmax=ext$xmax,
+          ymin=ext$ymin,
+          ymax=ext$ymax)
+  st_bbox(bbox, epsg)
 }
-
-
 
 
 #' Correct PostGIS table geometry errors
@@ -102,19 +100,16 @@ pgisGetBbox = function(conn,
 #' @param tbl character; table name.
 #' @param geom.col character; name of the geometry column (default: 'geometry).
 #' @param verbose boolean; wheter or not warning when correction are applied (default: TRUE)
-#' @param disconnect boolean; shall the connection be closed at the end ? (default: TRUE)
 #'
 #' @export
 #'
 #' @importFrom RPostgreSQL dbGetQuery
 #' @importFrom RPostgreSQL dbSendQuery
-#' @importFrom RPostgreSQL dbDisconnect
 #'
 pgisMakeValid = function(conn,
                          tbl,
                          geom.col   = "geometry",
-                         verbose    = TRUE,
-                         disconnect = TRUE)
+                         verbose    = TRUE)
 {
   # Correct geometry errors if any
   q =  paste0("SELECT count(*) FROM ", tbl, " WHERE ST_IsValid(", geom.col, ") = FALSE;")
@@ -125,8 +120,6 @@ pgisMakeValid = function(conn,
     if (verbose)
       message(paste0("Corrected ", nb_errors, " geometry errors"))
   }
-  if (disconnect)
-    dbDisconnect(conn)
 }
 
 
@@ -143,13 +136,12 @@ pgisMakeValid = function(conn,
 #' simplified geometry will be written. If identical to \code{geom.col}, this
 #' one is overwritten (default: geometry_simpl).
 #' @param verbose boolean; shall the gain of memory be printed ? (default: TRUE).
-#' @param disconnect boolean; shall the connection be closed at the end ? (default: TRUE)
 #'
 #' @export
 #'
 #' @importFrom RPostgreSQL dbGetQuery
 #' @importFrom RPostgreSQL dbSendQuery
-#' @importFrom RPostgreSQL dbDisconnect
+#'
 #' @examples
 #' library(spData)
 #' library(sf)
@@ -158,26 +150,27 @@ pgisMakeValid = function(conn,
 #' conn = dbConnect(drv=dbDriver("PostgreSQL"), host="localhost", port=5432,
 #'                dbname="foodflows", user="postgres", password="postgres")
 #' dbWriteTable(conn, name="seine", seine, overwrite=TRUE)
-#' pgisSimplifyGeom(conn, "seine", tolerance=10, disconnect=FALSE)
-#' pgisSimplifyGeom(conn, "seine", tolerance=100, disconnect=FALSE)
-#' pgisSimplifyGeom(conn, "seine", tolerance=1000, disconnect=FALSE)
+#' pgisSimplifyGeom(conn, "seine", tolerance=10)
+#' pgisSimplifyGeom(conn, "seine", tolerance=100)
+#' pgisSimplifyGeom(conn, "seine", tolerance=1000)
+#' dbDisconnect(conn)
 #'
 pgisSimplifyGeom = function(conn,
                             tbl,
                             tolerance,
                             geom.col     = "geometry",
                             new.geom.col = "geometry_simpl",
-                            verbose      = TRUE,
-                            disconnect   = TRUE)
+                            verbose      = TRUE)
 {
-  # Get geometry memory size before
+  # Get memory size u
   size0 = dbGetQuery(conn, paste0("SELECT SUM(ST_MemSize(", geom.col, ")) FROM ", tbl,";"))
   # Overwrite current geometry column, or store simplified geoemtry in a new column
   if (geom.col==new.geom.col) {
     warning("Overwrite geometry column")
+
   } else {
     # GGet table EPSG
-    epsg = pgisGetEPSG(conn, tbl, disconnect=FALSE)
+    epsg = pgisGetEPSG(conn, tbl)
     # Get table geometry type
     q = paste0("SELECT ST_GeometryType(", geom.col, ") FROM ", tbl, " LIMIT 1;")
     geom_type = dbGetQuery(conn, q)
@@ -198,6 +191,4 @@ pgisSimplifyGeom = function(conn,
     rate = abs(round(rate*100, 2))
     print(paste("Geometry size reduced by", rate, "%"))
   }
-  if (disconnect)
-    dbDisconnect(conn)
 }

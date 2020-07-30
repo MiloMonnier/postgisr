@@ -4,7 +4,7 @@
 \alias{pgisGetEPSG}
 \title{Get EPSG of a table}
 \usage{
-pgisGetEPSG(conn, tbl, geom.col = "geometry", disconnect = TRUE)
+pgisGetEPSG(conn, tbl, geom.col = "geometry")
 }
 \arguments{
 \item{conn}{a PostgreSQLConnection object.}
@@ -12,8 +12,6 @@ pgisGetEPSG(conn, tbl, geom.col = "geometry", disconnect = TRUE)
 \item{tbl}{character; table name.}
 
 \item{geom.col}{character; name of the geometry column (default: 'geometry).}
-
-\item{disconnect}{boolean; shall the connection be closed at the end ? (default: TRUE)}
 }
 \value{
 a numeric EPSG code of 4 numbers.
@@ -30,5 +28,6 @@ conn = dbConnect(drv=dbDriver("PostgreSQL"), host="localhost", port=5432,
                 dbname="foodflows", user="postgres", password="postgres")
 dbWriteTable(conn, name="seine", seine, overwrite=TRUE)
 (pgisGetEPSG(conn, "seine")==2154)
+dbDisconnect(conn)
 
 }
