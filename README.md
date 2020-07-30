@@ -1,5 +1,3 @@
-# Functions
-
 ## Tables managment functions
 
 These functions are not specific to PostGIS, but more generic to PostgreSQL. Thus the prefix "pg" is used, instead of "pgis"
@@ -12,8 +10,8 @@ These functions are not specific to PostGIS, but more generic to PostgreSQL. Thu
 
 * **pgisGetEPSG**: get the EPSG code of a PostGIS table. The ESPG defines the Coordinate Reference System (CRS) of the geometry.
 * **pgisGetBbox**: get the bounding box of the 
-* **pgisMakeValid**: 
-* **pgisSimplifyGeom**: 
+* **pgisMakeValid**: correct PostGIS poloygon tables geometry errors if any (e.g. polygons boundary lines cross-cuts).
+* **pgisSimplifyGeom**: wrapper to simplify the geometric complexity of PostGIS vector tables. Indeed, high precision geometries use more memory and lengthen geoprocessing. If we don't need high precision, we can reduce it.
 
 
 ## Raster functions
@@ -24,4 +22,11 @@ These functions are not specific to PostGIS, but more generic to PostgreSQL. Thu
 * **pgisRasterizeTable**: rasterize a PostGIS vector table into a new raster table.
 * **pgisPolygonizeRaster**: convert a PostGIS raster table into a new polygon grid table.
 
-# Installing
+
+##   Installing
+
+To install the package, run
+
+```
+devtools::install_github("MiloMonnier/postgisr")
+```
