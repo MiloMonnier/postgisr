@@ -1,3 +1,15 @@
+## Install
+
+To install the package, use [`remotes`](https://CRAN.R-project.org/package=remotes):
+
+```r
+remotes::install_github("MiloMonnier/postgisr")
+```
+
+You can find the full documentation of the package [here](https://138.197.187.155/index.php/s/o3ZDyF9KMYzRjoi).
+
+
+
 ## Tables managment functions
 
 These functions are not specific to PostGIS, but more generic to PostgreSQL. Thus the prefix "pg" is used, instead of "pgis"
@@ -21,12 +33,3 @@ These functions are not specific to PostGIS, but more generic to PostgreSQL. Thu
 * **pgisCreateRaster**: create into PostGIS a raster covering a given extent, with a given resolution.
 * **pgisRasterizeTable**: rasterize a PostGIS vector table into a new raster table.
 * **pgisPolygonizeRaster**: convert a PostGIS raster table into a new polygon grid table.
-
-
-##   Installing
-
-To install the package, run
-
-```
-devtools::install_github("MiloMonnier/postgisr")
-```
