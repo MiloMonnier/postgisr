@@ -22,7 +22,7 @@ List all indexes attached to tables of a database.
 library(RPostgreSQL)
 data(mtcars)
 conn = dbConnect(drv=dbDriver("PostgreSQL"), host="localhost", port=5432,
-                 dbname="postgres", user="postgres", password="postgres")
+                dbname="postgres", user="milo", password="postgres")
 dbWriteTable(conn, "mtcars", mtcars, overwrite=TRUE)
 dbSendQuery(conn, "CREATE INDEX IF NOT EXISTS mpg_idx ON mtcars USING btree(mpg);")
 head(pgListIndexes(conn, "mtcars"))

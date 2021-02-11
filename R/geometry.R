@@ -18,7 +18,7 @@
 #' library(RPostgreSQL)
 #' data(seine)
 #' conn = dbConnect(drv=dbDriver("PostgreSQL"), host="localhost", port=5432,
-#'                 dbname="foodflows", user="postgres", password="postgres")
+#'                 dbname="foodflows", user="milo", password="postgres")
 #' dbWriteTable(conn, name="seine", seine, overwrite=TRUE)
 #' (pgisGetEPSG(conn, "seine")==2154)
 #' dbDisconnect(conn)
@@ -56,7 +56,7 @@ pgisGetEPSG = function(conn,
 #' library(RPostgreSQL)
 #' data(seine)
 #' conn = dbConnect(drv=dbDriver("PostgreSQL"), host="localhost", port=5432,
-#'                 dbname="foodflows", user="postgres", password="postgres")
+#'                 dbname="foodflows", user="milo", password="postgres")
 #' dbWriteTable(conn, name="seine", seine, overwrite=TRUE)
 #' bb = pgisGetBbox(conn, "seine")
 #' (class(bb)=="bbox")
@@ -148,7 +148,7 @@ pgisMakeValid = function(conn,
 #' library(RPostgreSQL)
 #' data(seine)
 #' conn = dbConnect(drv=dbDriver("PostgreSQL"), host="localhost", port=5432,
-#'                dbname="foodflows", user="postgres", password="postgres")
+#'                dbname="foodflows", user="milo", password="postgres")
 #' dbWriteTable(conn, name="seine", seine, overwrite=TRUE)
 #' pgisSimplifyGeom(conn, "seine", tolerance=10)
 #' pgisSimplifyGeom(conn, "seine", tolerance=100)

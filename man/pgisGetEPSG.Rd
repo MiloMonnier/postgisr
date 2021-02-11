@@ -25,7 +25,7 @@ library(sf)
 library(RPostgreSQL)
 data(seine)
 conn = dbConnect(drv=dbDriver("PostgreSQL"), host="localhost", port=5432,
-                dbname="foodflows", user="postgres", password="postgres")
+                dbname="foodflows", user="milo", password="postgres")
 dbWriteTable(conn, name="seine", seine, overwrite=TRUE)
 (pgisGetEPSG(conn, "seine")==2154)
 dbDisconnect(conn)
